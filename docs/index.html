@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CWI Verification Receipts — try it</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #0d1117; color: #e6edf3;
+         margin: 0; padding: 24px; max-width: 720px; margin-inline: auto; }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  p.sub { color: #8b949e; margin-top: 0; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; margin: 16px 0; }
+  label { display: block; font-size: .85rem; color: #8b949e; margin: 12px 0 4px; }
+  input { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 8px;
+          border: 1px solid #30363d; background: #0d1117; color: #e6edf3; font-size: 1rem; }
+  button { margin-top: 16px; padding: 12px 20px; border: 0; border-radius: 8px; font-size: 1rem;
+           background: #1f6feb; color: #fff; cursor: pointer; }
+  button:hover { background: #388bfd; }
+  .try { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .try button { margin: 0; padding: 8px 12px; font-size: .85rem; background: #21262d; }
+  .receipt { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: .85rem;
+             background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-weight: 700; font-size: .8rem; }
+  .v-verified { background: #1a7f37; color: #fff; }
+  .v-stale { background: #9e6a03; color: #fff; }
+  .v-no { background: #6e7681; color: #fff; }
+  .limits { font-size: .8rem; color: #8b949e; }
+  a { color: #58a6ff; }
+</style>
+</head>
+<body>
+<h1>🧾 CWI verification receipts</h1>
+<p class="sub">On Instagram, comment <b>PROOF</b> on a placement post and get the receipt by DM.
+This page shows you exactly what that receipt looks like — under a minute.</p>
+
+<div class="card">
+  <label for="track">Track</label>
+  <input id="track" placeholder="Zooted Zone" autocomplete="off">
+  <label for="playlist">Playlist</label>
+  <input id="playlist" placeholder="360°: The Best Indie Music" autocomplete="off">
+  <button onclick="run()">Get my receipt</button>
+  <div class="try">
+    <button onclick="fill('Zooted Zone','360°: The Best Indie Music')">try: verified placement</button>
+    <button onclick="fill('Shaka Zulu','New Rap Hits')">try: stale evidence</button>
+    <button onclick="fill('Fake Track','Fake Playlist')">try: invented claim</button>
+  </div>
+</div>
+
+<div class="card" id="out" style="display:none">
+  <span class="badge" id="badge"></span>
+  <div class="receipt" id="dmtext" style="margin-top:12px"></div>
+  <p class="limits" id="meta"></p>
+</div>
+
+<div class="card limits">
+  <b>Honest limits.</b> Receipts grade against CWI's verified evidence only — this is our
+  verified view as of the observation date, not a universal authority. Unknown or conflicting
+  claims get an honest <i>cannot verify</i>, never a fake pass. Evidence older than 48h is
+  labeled stale. DMs fire only when <i>you</i> comment the keyword; reply STOP to opt out, always.
+  Live Instagram delivery is pending account linking —
+  <a href="https://github.com/CumulativeWebInc/cwi-ig-receipts/blob/main/ACCOUNT-LINKING.md">the checklist is public</a>.
+</div>
+
+<script src="./receipt.js"></script>
+<script>
+var EVIDENCE = [
+  { track: "Zooted Zone", playlist: "360°: The Best Indie Music", playlist_id: "0hsLLFaADDjU54tFqaImFh",
+    position: 216, total: 216, observed_at: new Date(Date.now() - 3600e3).toISOString(),
+    verifier: "CWI_Data", tier: "verified",
+    evidence_url: "https://open.spotify.com/playlist/0hsLLFaADDjU54tFqaImFh" },
+  { track: "Shaka Zulu", playlist: "New Rap Hits", position: 21, total: null,
+    observed_at: "2026-09-15T12:00:00Z", verifier: "CWI_Data", tier: "verified", evidence_url: null },
+  { track: "Zooted Zone", playlist: "New Rap Hits", position: 30, total: null,
+    observed_at: "2026-09-15T12:00:00Z", verifier: "CWI_Data", tier: "verified", evidence_url: null },
+  { track: "Doves & Diamonds", playlist: "New Rap Hits", position: 31, total: null,
+    observed_at: "2026-09-15T12:00:00Z", verifier: "CWI_Data", tier: "verified", evidence_url: null }
+];
+function fill(t, p) {
+  document.getElementById('track').value = t;
+  document.getElementById('playlist').value = p;
+  run();
+}
+function run() {
+  var claim = { track: document.getElementById('track').value,
+                playlist: document.getElementById('playlist').value };
+  var r = CWIReceipts.makeReceipt(claim, EVIDENCE, Date.now());
+  var badge = document.getElementById('badge');
+  badge.textContent = r.verdict === 'verified' ? 'VERIFIED'
+    : r.verdict === 'verified-stale' ? 'VERIFIED — STALE' : 'CANNOT VERIFY';
+  badge.className = 'badge ' + (r.verdict === 'verified' ? 'v-verified'
+    : r.verdict === 'verified-stale' ? 'v-stale' : 'v-no');
+  document.getElementById('dmtext').textContent = CWIReceipts.renderDM(r);
+  document.getElementById('meta').textContent =
+    'receipt ' + r.receipt_id + ' · issued ' + r.issued_at +
+    (r.reason ? ' · ' + r.reason : '');
+  document.getElementById('out').style.display = 'block';
+}
+</script>
+</body>
+</html>
