@@ -1,0 +1,43 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Instagram Receipts API",
+    "version": "1.0.0",
+    "description": "Public receipts of the CWI promo operation: what was posted, where, and what verified. The paper trail behind the ROAD-1M push and the catalog promo stack \u2014 receipts, not claims. Public read-only API. All endpoints are static files served over HTTPS GET via GitHub Pages. No authentication required.",
+    "contact": {
+      "name": "Cumulative Web Inc",
+      "url": "https://cumulativeweb.com",
+      "email": "hp@cumulativeweb.com"
+    },
+    "license": {
+      "name": "See https://cumulativewebinc.github.io/cwi-legal/terms.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://cumulativewebinc.github.io/cwi-ig-receipts",
+      "description": "Production"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "getProductPage",
+        "summary": "Product page",
+        "description": "Instagram receipts UI",
+        "responses": {
+          "200": {
+            "description": "Product page",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
